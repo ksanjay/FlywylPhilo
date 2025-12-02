@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Flywyl Philosophy</title>
+    
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons (CDN) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #020617; /* Slate 950 */
+        }
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569; 
+        }
+    </style>
+</head>
+<body class="text-slate-200 selection:bg-teal-500/30 selection:text-teal-200 antialiased overflow-x-hidden">
+
+    <!-- Canvas Background -->
+    <canvas id="particle-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-0 opacity-40"></canvas>
+
+    <!-- Main Container -->
+    <div class="relative z-10 container mx-auto px-6 py-12 max-w-7xl">
+        
+        <!-- Header Section -->
+        <header class="mb-20 text-center md:text-left animate-fade-in-down">
+            <div class="inline-flex items-center space-x-2 mb-4 px-3 py-1 rounded-full bg-slate-900/80 border border-slate-800 text-xs font-mono text-teal-400 backdrop-blur-sm">
+                <span class="relative flex h-2 w-2">
+            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-white mb-2">
+                The <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-cyan-500">Flywyl</span> Philosophy
+            </h1>
+
+            <div class="flex items-center justify-center md:justify-start space-x-2 text-slate-500 font-mono text-sm mb-6 md:ml-1">
+                <span>With</span>
+                <i data-lucide="heart" class="w-3 h-3 text-pink-500 fill-pink-500/20"></i>
+                <span>from Sanjay</span>
+            </div>
+            
+            <p class="max-w-2xl text-lg text-slate-400 leading-relaxed md:ml-1 border-l-4 border-teal-500/20 pl-6">
+                A quantitative approach to market analysis. Leveraging second-order data derivation and high-definition signal processing to uncover asymmetric risk/reward opportunities.
+            </p>
+        </header>
+
+        <!-- Dashboard Grid -->
+        <main>
+            <div class="flex items-center space-x-2 mb-8 text-slate-500 font-mono text-sm uppercase tracking-widest">
+                <i data-lucide="layers" class="w-4 h-4"></i>
+                <span>Active Strategies</span>
+                <div class="h-px bg-slate-800 flex-grow ml-4"></div>
+            </div>
+
+            <!-- Grid Container (Populated by JS) -->
+            <div id="grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Javascript will insert tiles here -->
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-24 pt-8 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center text-slate-600 text-sm">
+            <p>© <span id="year"></span> The Flywyl Philosophy. All rights reserved.</p>
+            <div class="flex space-x-6 mt-4 md:mt-0 font-mono">
+                <span class="hover:text-teal-500 cursor-pointer transition-colors">GITHUB</span>
+                <span class="hover:text-teal-500 cursor-pointer transition-colors">ANALYSIS</span>
+                <span class="hover:text-teal-500 cursor-pointer transition-colors">CONTACT</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- CONFIGURATION: Add your models here ---
+        const PORTFOLIO_ITEMS = [
+            {
+                id: 1,
+                title: "HDG Signal",
+                url: "https://hdgsignal.onrender.com/",
+                description: "Advanced hedging and signal processing algorithms for market trend detection.",
+                icon: "activity", // Lucide icon name
+                tags: ["Signal Processing", "Trend Analysis"],
+                status: "Live"
+            },
+            {
+                id: 2,
+                title: "Druckenmiller 2nd Order ROC",
+                url: "https://druckenmiller-2nd-order-roc.onrender.com/",
+                description: "Second-order Rate of Change analysis methodology inspired by Stanley Druckenmiller's investment philosophy.",
+                icon: "trending-up", // Lucide icon name
+                tags: ["Macro", "Rate of Change", "Druckenmiller"],
+                status: "Live"
+            }
+        ];
+
+        // --- RENDER LOGIC ---
+        
+        // 1. Set Footer Year
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // 2. Render Tiles
+        const gridContainer = document.getElementById('grid-container');
+
+        // Function to create a standard tile
+        const createTile = (item) => {
+            // Generate tags HTML
+            const tagsHtml = item.tags.map(tag => 
+                `<span class="text-[10px] uppercase tracking-wider font-semibold text-slate-500 bg-slate-800/50 px-2 py-1 rounded border border-slate-700/50">${tag}</span>`
+            ).join('');
+
+            return `
+            <a href="${item.url}" target="_blank" rel="noopener noreferrer" 
+               class="group relative bg-slate-900/60 backdrop-blur-md border border-slate-700/50 rounded-xl p-6 transition-all duration-300 hover:border-teal-500/50 hover:shadow-[0_0_30px_rgba(20,184,166,0.15)] flex flex-col h-full overflow-hidden">
+                
+                <!-- Hover Gradient Overlay -->
+                <div class="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                <!-- Header -->
+                <div class="flex justify-between items-start mb-4 z-10">
+                    <div class="p-3 bg-slate-800/80 rounded-lg border border-slate-700 group-hover:border-teal-500/30 transition-colors">
+                        <i data-lucide="${item.icon}" class="w-6 h-6 text-teal-400"></i>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs font-mono text-teal-400/80 bg-teal-900/20 px-2 py-1 rounded">${item.status}</span>
+                        <i data-lucide="external-link" class="w-4 h-4 text-slate-500 group-hover:text-teal-400 transition-colors"></i>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="z-10 flex-grow">
+                    <h3 class="text-xl font-bold text-slate-100 mb-2 group-hover:text-teal-50 transition-colors">${item.title}</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-6">${item.description}</p>
+                </div>
+
+                <!-- Footer / Tags -->
+                <div class="mt-auto z-10 pt-4 border-t border-slate-800/50">
+                    <div class="flex flex-wrap gap-2">
+                        ${tagsHtml}
+                    </div>
+                </div>
+            </a>
+            `;
+        };
+
+        // Function to create the placeholder tile
+        const createPlaceholder = () => {
+            return `
+            <div class="relative border-2 border-dashed border-slate-800 rounded-xl p-6 flex flex-col items-center justify-center text-slate-600 min-h-[280px] group hover:border-slate-700 transition-colors bg-slate-900/20">
+                <div class="mb-4 p-4 rounded-full bg-slate-900/50 group-hover:bg-slate-800 transition-colors">
+                    <i data-lucide="plus" class="w-8 h-8 opacity-50"></i>
+                </div>
+                <span class="font-mono text-sm opacity-50">Future Strategy</span>
+                <span class="text-xs text-slate-700 mt-2 text-center max-w-[200px]">
+                    New models will appear here automatically as the portfolio expands.
+                </span>
+            </div>
+            `;
+        };
+
+        // Inject HTML
+        let gridHtml = PORTFOLIO_ITEMS.map(item => createTile(item)).join('');
+        gridHtml += createPlaceholder();
+        gridContainer.innerHTML = gridHtml;
+
+        // 3. Initialize Icons
+        lucide.createIcons();
+
+        // 4. Particle Background Animation (Vanilla JS Port)
+        const initCanvas = () => {
+            const canvas = document.getElementById('particle-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let animationFrameId;
+
+            const resizeCanvas = () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            };
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.vx = (Math.random() - 0.5) * 0.5;
+                    this.vy = (Math.random() - 0.5) * 0.5;
+                    this.size = Math.random() * 2;
+                    this.opacity = Math.random() * 0.5 + 0.1;
+                }
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(100, 255, 218, ${this.opacity})`;
+                    ctx.fill();
+                }
+            }
+
+            // Create particles
+            for (let i = 0; i < 60; i++) {
+                particles.push(new Particle());
+            }
+
+            const animate = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                particles.forEach((p, index) => {
+                    p.update();
+                    p.draw();
+                    
+                    // Draw connections
+                    for (let j = index + 1; j < particles.length; j++) {
+                        const p2 = particles[j];
+                        const dx = p.x - p2.x;
+                        const dy = p.y - p2.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < 150) {
+                            ctx.beginPath();
+                            ctx.strokeStyle = `rgba(100, 255, 218, ${0.15 * (1 - distance / 150)})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.moveTo(p.x, p.y);
+                            ctx.lineTo(p2.x, p2.y);
+                            ctx.stroke();
+                        }
+                    }
+                });
+                requestAnimationFrame(animate);
+            };
+            animate();
+        };
+
+        // Start animation when page loads
+        window.addEventListener('load', initCanvas);
+
+    </script>
+</body>
+</html>
